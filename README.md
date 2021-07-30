@@ -6,24 +6,24 @@
 
 ---
 # Dependencies
-This plugin is depending on the [DokusCore](https://github.com/dokucore) Framework!
+This plugin is depending on the [DokusCore](https://github.com/dokucore) Framework!<br>
 Make sure that DokusCore is started before this plugin!
 
 ---
 # Installation
 Simply extract the `DokusCore--MultiCharacters` into your `resources` folder, <br>
 and start it via `ensure DokusCore--MultiCharacters`. Then go to the Config.lua <br>
-file of `DokusCore` itself and at `_Modules = { MultiCharacters }` set it to `true`.
-If left to `false` the core will create its own character on ID 1 and not the
+file of `DokusCore` itself and at `_Modules = { MultiCharacters }` set it to `true`.<br>
+If left to `false` the core will create its own character on ID 1 and not the<br>
 multi characters plugin
 
 ---
 # Plugin Information
-This plugin is as the title applies, it grants your users the ability
-to create multiple characters. At this menu the user is able to create a
-character with fist and last name, birthdate, sex and nationality. If any of
-the values are not filled in, the user receives a message to create a new
-character. You are also able to logout and select a new character without
+This plugin is as the title applies, it grants your users the ability<br>
+to create multiple characters. At this menu the user is able to create a<br>
+character with fist and last name, birthdate, sex and nationality. If any of<br>
+the values are not filled in, the user receives a message to create a new<br>
+character. You are also able to logout and select a new character without<br>
 relogging to the server!
 
 ---
