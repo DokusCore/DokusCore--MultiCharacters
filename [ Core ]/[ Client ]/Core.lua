@@ -11,6 +11,8 @@ RegisterCommand('logout', function(source, args, rawCommand)
   local Steam = TSC('DokusCore:S:Core:GetUserIDs')[1]
   local Event = 'DokusCore:S:Core:DB:UpdateViaSteamAndCharID'
   TSC(Event, {DB.Characters.SetCoords, 'Coords', Coords, Steam, SelectedID})
+  TriggerEvent('DokusCore:C:Core:Hud:Toggle', false)
+  TriggerEvent('DokusCore:C:Core:Hud:Update', {0, 0})
   SelectedID = nil
 end)
 --------------------------------------------------------------------------------
@@ -18,6 +20,7 @@ end)
 CreateThread(function()
 	while true do Wait(0)
     local Network = NetworkIsSessionStarted()
+    TriggerEvent('DokusCore:C:Core:Hud:Toggle', false)
     TriggerEvent('DokusCore:MultiChar:C:SetInvisible', false, true)
 		if Network then	TriggerEvent('DokusCore:MultiChar:C:ChooseChar') return end
 	end
@@ -44,12 +47,13 @@ end)
 RegisterNUICallback('selectCharacter', function(Data)
   DoScreenFadeOut(1500) Wait(1500)
   ToggleMenu(false)
+  local Ped = PlayerPedId()
   local CharID = Data['cData']['CharID']
   local Steam = Data['cData']['Steam']
   SelectedID = CharID
   local Event = 'DokusCore:S:Core:DB:GetViaSteamAndCharID'
-  local Data = TSC(Event, {DB.Characters.Get, Steam, CharID})
-  local Data = ConvertToCoords(Data.Coords)
+  local cData = TSC(Event, {DB.Characters.Get, Steam, CharID})
+  local Data = ConvertToCoords(cData.Coords)
   local Data = SplitString(Data, " ")
   local x,y,z = tonumber(Data[1]), tonumber(Data[2]), tonumber(Data[3])
   local Coords = vector3(x,y,z)
@@ -57,6 +61,11 @@ RegisterNUICallback('selectCharacter', function(Data)
   TSC('DokusCore:S:Core:UpdateCoreUserData', {'Coords', Coords})
   TriggerEvent('DokusCore:MultiChar:C:TPPlayer', Coords)
   TriggerEvent('DokusCore:MultiChar:C:SetInvisible', true, false)
+  local Data = TSC('DokusCore:S:Core:DB:GetViaSteamAndCharID', {DB.Banks.Get, Steam, CharID})
+  TriggerEvent('DokusCore:C:Core:Hud:Update', {Data.Money, Data.BankMoney})
+  TriggerEvent('DokusCore:C:Core:Hud:Toggle', true)
+  local Skin = json.decode(cData.Skin)
+  if (Skin ~= nil) then TriggerEvent('DokusCore:SkinCreator:C:SetSkin', Skin) end
   Wait(1000) DoScreenFadeIn(1500)
 end)
 --------------------------------------------------------------------------------
@@ -91,7 +100,12 @@ RegisterNUICallback('createNewCharacter', function(Data)
   SetCoords(Ped, _StartCoords[1], _StartCoords[2], _StartCoords[3], true, false)
   TSC('DokusCore:S:Core:UpdateCoreUserData', {'Coords', vector3(_StartCoords[1], _StartCoords[2], _StartCoords[3])})
   TriggerEvent('DokusCore:C:Core:Sounds:PlayOnUser', 'TrainPass', 1.0) Wait(15000)
-  DoScreenFadeIn(15000)
+  local Data = TSC('DokusCore:S:Core:DB:GetViaSteamAndCharID', {DB.Banks.Get, Steam, CharID})
+  TriggerEvent('DokusCore:C:Core:Hud:Update', {Data.Money, Data.BankMoney})
+  local pCoords = GetEntityCoords(Ped)
+  TriggerEvent('DokusCore:SkinCreator:C:OpenMenu', Ped, pCoords)
+  DoScreenFadeIn(15000) Wait(3000)
+  TriggerEvent('DokusCore:C:Core:Hud:Toggle', true)
 end)
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

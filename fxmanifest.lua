@@ -5,7 +5,6 @@ description 'DokusCore Multi Characters'
 author 'http://DokusCore.com'
 fx_version "adamant"
 games {"rdr3"}
-version '1.0.0'
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 client_scripts { '[ Core ]/[ Client ]/*.lua' }

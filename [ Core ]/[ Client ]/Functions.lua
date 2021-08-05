@@ -1,10 +1,7 @@
 --------------------------------------------------------------------------------
 ---------------------------------- DokusCore -----------------------------------
 --------------------------------------------------------------------------------
-function ToggleMenu(bool) SetNuiFocus(bool, bool)
-  SendNUIMessage({action = "ui", toggle = bool})
-  skyCam(bool)
-end
+function ToggleMenu(bool) SetNuiFocus(bool, bool) SendNUIMessage({action = "ui", toggle = bool}) skyCam(bool) end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function skyCam(bool)
