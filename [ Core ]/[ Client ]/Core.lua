@@ -52,7 +52,7 @@ RegisterNUICallback('selectCharacter', function(Data)
   local Steam = Data['cData']['Steam']
   SelectedID = CharID
   local Event = 'DokusCore:S:Core:DB:GetViaSteamAndCharID'
-  local cData = TSC(Event, {DB.Characters.Get, Steam, CharID})
+  local cData = TSC(Event, {DB.Characters.Get, Steam, CharID})[1]
   local Data = ConvertToCoords(cData.Coords)
   local Data = SplitString(Data, " ")
   local x,y,z = tonumber(Data[1]), tonumber(Data[2]), tonumber(Data[3])
@@ -61,7 +61,7 @@ RegisterNUICallback('selectCharacter', function(Data)
   TSC('DokusCore:S:Core:UpdateCoreUserData', {'Coords', Coords})
   TriggerEvent('DokusCore:MultiChar:C:TPPlayer', Coords)
   TriggerEvent('DokusCore:MultiChar:C:SetInvisible', true, false)
-  local Data = TSC('DokusCore:S:Core:DB:GetViaSteamAndCharID', {DB.Banks.Get, Steam, CharID})
+  local Data = TSC('DokusCore:S:Core:DB:GetViaSteamAndCharID', {DB.Banks.Get, Steam, CharID})[1]
   TriggerEvent('DokusCore:C:Core:Hud:Update', {Data.Money, Data.BankMoney})
   TriggerEvent('DokusCore:C:Core:Hud:Toggle', true)
   local Skin = json.decode(cData.Skin)
@@ -100,12 +100,15 @@ RegisterNUICallback('createNewCharacter', function(Data)
   SetCoords(Ped, _StartCoords[1], _StartCoords[2], _StartCoords[3], true, false)
   TSC('DokusCore:S:Core:UpdateCoreUserData', {'Coords', vector3(_StartCoords[1], _StartCoords[2], _StartCoords[3])})
   TriggerEvent('DokusCore:C:Core:Sounds:PlayOnUser', 'TrainPass', 1.0) Wait(15000)
-  local Data = TSC('DokusCore:S:Core:DB:GetViaSteamAndCharID', {DB.Banks.Get, Steam, CharID})
+  local Data = TSC('DokusCore:S:Core:DB:GetViaSteamAndCharID', {DB.Banks.Get, Steam, CharID})[1]
   TriggerEvent('DokusCore:C:Core:Hud:Update', {Data.Money, Data.BankMoney})
   local pCoords = GetEntityCoords(Ped)
   TriggerEvent('DokusCore:SkinCreator:C:OpenMenu', Ped, pCoords)
   DoScreenFadeIn(15000) Wait(3000)
   TriggerEvent('DokusCore:C:Core:Hud:Toggle', true)
+  local Index =
+  TSC('DokusCore:S:Core:DB:AddInventoryItem', { Steam, CharID, 'Consumable', { 'coffee', 3, nil }})
+  TSC('DokusCore:S:Core:DB:AddInventoryItem', { Steam, CharID, 'Consumable', { 'meat', 2, nil }})
 end)
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
