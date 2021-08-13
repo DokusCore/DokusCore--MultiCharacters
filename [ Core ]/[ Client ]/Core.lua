@@ -62,7 +62,8 @@ RegisterNUICallback('selectCharacter', function(Data)
   TriggerEvent('DokusCore:MultiChar:C:TPPlayer', Coords)
   TriggerEvent('DokusCore:MultiChar:C:SetInvisible', true, false)
   local Data = TSC('DokusCore:S:Core:DB:GetViaSteamAndCharID', {DB.Banks.Get, Steam, CharID})[1]
-  TriggerEvent('DokusCore:C:Core:Hud:Update', {Data.Money, Data.BankMoney})
+  local sID = TSC('DokusCore:S:Core:GetUserServerID')
+  TriggerEvent('DokusCore:C:Core:Hud:Update', {Data.Money, Data.BankMoney, SelectedID, sID})
   TriggerEvent('DokusCore:C:Core:Hud:Toggle', true)
   local Skin = json.decode(cData.Skin)
   if (Skin ~= nil) then TriggerEvent('DokusCore:SkinCreator:C:SetSkin', Skin) end
@@ -93,6 +94,8 @@ RegisterNUICallback('createNewCharacter', function(Data)
   local source = source
   local Ped = PlayerPedId()
   local Steam, CharID = Data.Steam, Data.CharID
+  SelectedID = CharID
+  TSC('DokusCore:S:Core:UpdateCoreUserData', { 'CharID', CharID })
   DoScreenFadeOut(1500) Wait(1500)
   SetNuiFocus(false, false)
   ToggleMenu(false)
@@ -106,14 +109,14 @@ RegisterNUICallback('createNewCharacter', function(Data)
   TriggerEvent('DokusCore:SkinCreator:C:OpenMenu', Ped, pCoords)
   DoScreenFadeIn(15000) Wait(3000)
   TriggerEvent('DokusCore:C:Core:Hud:Toggle', true)
-  local Index =
   TSC('DokusCore:S:Core:DB:AddInventoryItem', { Steam, CharID, 'Consumable', { 'coffee', 3, nil }})
   TSC('DokusCore:S:Core:DB:AddInventoryItem', { Steam, CharID, 'Consumable', { 'meat', 2, nil }})
 end)
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 RegisterNUICallback('removeCharacter', function(Data)
-  TriggerServerEvent('DokusCore:MultiChar:S:DeleteCharacter', Data.Steam, Data.CharID)
+  TSC('DokusCore:S:Core:DB:RemoveAllCharData', {Data.Steam, Data.CharID})
+  TriggerEvent('DokusCore:MultiChar:C:ChooseChar')
 end)
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -132,7 +135,12 @@ AddEventHandler('DokusCore:MultiChar:C:TPPlayer', function(Coords)
   local Ped = PlayerPedId()
   SetEntityCoords(Ped, Coords)
 end)
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+RegisterNetEvent('DokusCore:MultiChar:C:GetCharID')
+AddEventHandler('DokusCore:MultiChar:C:GetCharID', function()
+  TSC('DokusCore:S:Core:UpdateCoreUserData', { 'CharID', SelectedID })
+end)
 
 
 

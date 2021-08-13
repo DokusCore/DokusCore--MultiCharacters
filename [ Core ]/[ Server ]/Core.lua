@@ -26,10 +26,6 @@ AddEventHandler('DokusCore:MultiChar:S:CreateCharacter', function(Data, x,y,z)
     Gold = _StartWealth.Gold, BankGold = _StartWealth.BankGold
   }
 
-  for k,v in pairs(mBanks) do
-    print(k,v)
-  end
-
   MySQL.Async.execute(DB.Characters.InsertTable, mChar, function() end)
   MySQL.Async.execute(DB.Banks.InsertTable, mBanks, function() end)
   local NeedError = false
@@ -49,14 +45,6 @@ AddEventHandler('DokusCore:MultiChar:S:IncorrectData', function(source)
     TriggerClientEvent('DokusCore:C:Core:ShowTip', source, _('MultiChar:IncorrectData', User.Language), 5000)
     Wait(5000)
   end
-end)
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-RegisterServerEvent('DokusCore:MultiChar:S:DeleteCharacter')
-AddEventHandler('DokusCore:MultiChar:S:DeleteCharacter', function(Steam, CharID)
-  local Table = DB.Characters.DelViaSteamAndCharID
-  local User = TCC(-1, 'DokusCore:C:Core:DB:DelViaSteamAndCharID', {Table, Steam, CharID})
-  TriggerClientEvent('DokusCore:MultiChar:C:ChooseChar', -1)
 end)
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
