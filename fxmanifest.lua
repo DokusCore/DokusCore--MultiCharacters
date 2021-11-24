@@ -5,17 +5,17 @@ description 'DokusCore Multi Characters'
 author 'http://DokusCore.com'
 fx_version "adamant"
 games {"rdr3"}
-version '1.0.2'
+version '1.1.0'
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 client_scripts { '[ Core ]/[ Client ]/*.lua' }
 server_scripts { '@mysql-async/lib/MySQL.lua', '[ Core ]/[ Server ]/*.lua' }
+--------------------------------------------------------------------------------
 shared_script {
-  'Config.lua',
-  '@DokusCore/Config.lua',
-  '@DokusCore/[ Core ]/[ System ]/Callbacks.lua',
-  '@DokusCore/[ Core ]/[ Server ]/[ Data ]/DBTables.lua',
+  '@DokusCore/[ Core ]/[ System ]/CBSystem.lua',
+  '@DokusCore/[ Configs ]/[ Core ]/Core.lua',
   '@DokusCore/[ Core ]/[ System ]/Languinator.lua',
+  '@DokusCore/[ Configs ]/[ Modules ]/MultiCharacters.lua',
   '@DokusCore/[ Core ]/[ System ]/[ Language ]/bg.lua',
   '@DokusCore/[ Core ]/[ System ]/[ Language ]/de.lua',
   '@DokusCore/[ Core ]/[ System ]/[ Language ]/dk.lua',

@@ -23,28 +23,39 @@ function skyCam(bool)
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function SetCoords(Ped, x,y,z, visible, freeze)
-  SetEntityVisible(Ped, visible)
-  FreezeEntityPosition(Ped, freeze)
-  SetEntityCoords(Ped, x,y,z)
+function SetInvisible(Visible, Freeze)
+  local source = source
+  local PedID = PlayerPedId()
+  SetEntityVisible(PedID, Visible)
+  FreezeEntityPosition(PedID, Freeze)
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function SplitString(s, delimiter)
-  result = {};
-  for match in (s..delimiter):gmatch("(.-)"..delimiter) do
-      table.insert(result, match);
-  end
-  return result;
+function Notify(txt, pos, time)
+  TriggerEvent("pNotify:SendNotification", {
+    text = "<height='40' width='40' style='float:left; margin-bottom:10px; margin-left:20px;' />"..txt,
+    type = "success", timeout = time, layout = pos, queue = "right"
+  })
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function ConvertToCoords(string)
-  local Data = string.gsub(string, "{", "")
-  local Data = string.gsub(Data, "}", "")
-  local Data = string.gsub(Data, ",", "")
-  return Data
+function SetCoords(PedID, Coords, Heading)
+  SetEntityCoords(PedID, Coords)
+  SetEntityHeading(PedID, Heading)
 end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function IsError(Reason)
+  if (Reason == 'FirstNameIsEmpty') then Notify('ERROR: The first name parameter is empty, please create your character again!', 'TopRight', 10000) end
+  if (Reason == 'LastNameIsEmpty') then Notify('ERROR: The last name parameter is empty, please create your character again!', 'TopRight', 10000) end
+  if (Reason == 'NatIsEmpty') then Notify('ERROR: The nationality parameter is empty, please create your character again!', 'TopRight', 10000) end
+  if (Reason == 'BirthIsEmpty') then Notify('ERROR: The Birthdate parameter is empty, please create your character again!', 'TopRight', 10000) end
+  if (Reason == 'NameError') then Notify('ERROR: You have a number in your name. Numbers are not suppose to be in your name. Please create your character again!', 'TopRight', 10000) end
+  if (Reason == 'NatError') then Notify('ERROR: You have a number in your nationality. Numbers are not suppose to be in your nationality. Please create your character again!', 'TopRight', 10000) end
+  TriggerEvent('DokusCore:MultiChar:ChooseChar')
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 
@@ -67,4 +78,39 @@ end
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
