@@ -1,7 +1,7 @@
 ---
 <p align="center">
   <img width="600" height="200" src="https://user-images.githubusercontent.com/49053928/111937011-2e9b8080-8ac7-11eb-914a-a0d94380d611.gif"><br>
- <b>DokusCore MultiCharacters (v1.4.1)</b> - Gives player the ability to create multiple characters.
+ <b>DokusCore MultiCharacters (v1.5.0)</b> - Gives player the ability to create multiple characters.
 </p>
 
 ---
@@ -16,12 +16,6 @@ and start it via `ensure DokusCore--MultiCharacters`. Then go to the Config.lua 
 file of `DokusCore` itself and at `_Modules = { MultiCharacters }` set it to `true`.
 If left to `false` the core will create its own character on ID 1 and not the
 multi characters plugin
-
----
-# Install DokusCore withing 10 minutes!
-Simply [Download](https://github.com/DokusCore/Server-Prebuild) the prebuild server that has the server and all its features <br>
-pre-Installed. Simply add your server artifacts and configure the cfg files, <br>
-inject the database and you're done!
 
 ---
 # Plugin Information
