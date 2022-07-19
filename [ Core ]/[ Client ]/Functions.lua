@@ -1,5 +1,7 @@
 --------------------------------------------------------------------------------
----------------------------------- DokusCore -----------------------------------
+----------------------------------- DevDokus -----------------------------------
+--------------------------------------------------------------------------------
+----------------------- I feel a disturbance in the force ----------------------
 --------------------------------------------------------------------------------
 function FrameReady()
   local Data = TCTCC('DokuCore:Sync:Get:CoreData')
@@ -13,74 +15,132 @@ function UserInGame()
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function ToggleMenu(bool)
-  UIFocus(bool, bool)
-  SendNUIMessage({action = "ui", toggle = bool})
-  skyCam(bool)
+function SetCharData()
+  local CharData = {}
+  local Data = TSC('DokusCore:Core:DBGet:Characters', { 'User', 'All', { SteamID } })
+  if (Data.Exist) then for k,v in pairs(Data.Result) do Tabi(CharData, Data.Result[k]) end end
+  return CharData
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function skyCam(bool)
-  if bool then
-    DoScreenFadeIn(1000)
-    SetTimecycleModifier('hud_def_blur')
-    SetTimecycleModifierStrength(1.0)
-    FreezeEntityPosition(GetPlayerPed(-1), false)
-    cam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", - 2308.48, 379.17, 174.46, 0.0, 0.0, 333.5, 60.00, false, 0)
-    SetCamActive(cam, true)
-    RenderScriptCams(true, false, 1, true, true)
-  else
-    SetTimecycleModifier('default')
-    SetCamActive(cam, false)
-    DestroyCam(cam, true)
-    RenderScriptCams(false, false, 1, true, true)
-    FreezeEntityPosition(GetPlayerPed(-1), false)
+function SkipCamp(CharData)
+  if (CharData[1] == nil) then
+    TriggerEvent('DokusCore:Skins:User:New', 1)
+    TriggerEvent('DokusCore:Sync:Set:UserData', { 'CharID', { 1 } })
+    return true
+  else return false
   end
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function IsError(Reason)
-  if (Reason == 'FirstNameIsEmpty') then Notify('ERROR: The first name parameter is empty, please create your character again!', 'TopRight', 10000) end
-  if (Reason == 'LastNameIsEmpty') then Notify('ERROR: The last name parameter is empty, please create your character again!', 'TopRight', 10000) end
-  if (Reason == 'NatIsEmpty') then Notify('ERROR: The nationality parameter is empty, please create your character again!', 'TopRight', 10000) end
-  if (Reason == 'BirthIsEmpty') then Notify('ERROR: The Birthdate parameter is empty, please create your character again!', 'TopRight', 10000) end
-  if (Reason == 'NameError') then Notify('ERROR: You have a number in your name. Numbers are not suppose to be in your name. Please create your character again!', 'TopRight', 10000) end
-  if (Reason == 'NatError') then Notify('ERROR: You have a number in your nationality. Numbers are not suppose to be in your nationality. Please create your character again!', 'TopRight', 10000) end
-  TriggerEvent('DokusCore:MultiChar:ChooseChar')
+function SetCampCamera()
+  CampCam = CreateCamWithParams("DEFAULT_SCRIPTED_CAMERA", Camera, 50.00, 0.00, 0.0, 50.00, false, 0)
+  PointCamAtCoord(CampCam, 882.818, 1265.922, 235.682)
+  SetCameraActive('CampCam', true)
+  RenderScriptCams(true, false, 1, true, true)
+  CamInUse = CampCam
+  CamCampSet = true
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function Logout()
-  local PedID = PedID()
-  local Pos = GetCoords(PedID)
-  local Coords = Encoded(Pos)
-  TriggerServerEvent('DokusCore:Core:DBSet:Characters', { 'Coords', { Steam, UserID, Coords } })
-  -- TriggerEvent('DokusCore:Core:Hud:Toggle', false)
+function SpawnPlayerPeds(CharData)
+  for k,v in pairs(CharData) do
+    LoadModel(v.Gender)
+    local PED = SpawnNPC(v.Gender, Spawns[k].Start, 0.0)
+    NetworkGhosting(PED, true)
+    Tabi(NPCs, PED) Wait(300)
+    UnloadModel(v.Gender)
+  end
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function LoadAllPlayerPedSkins(CharData)
+  for k,v in pairs(CharData) do
+    TriggerEvent('DokusCore:Skins:Load:NPC', NPCs[k], v)
+  end
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function SendPedToCamp(PedID)
+  SetCoords(PedID, Camera)
   SetVisible(PedID, false)
+  SetInvincible(PedID, true)
   SetFreeze(PedID, true)
-
-  -- Open MultiCharacters login screen
-  TriggerEvent('DokusCore:MultiChar:ChooseChar')
-
-  -- Reset the DataSync
-  TriggerEvent('DokusCore:Sync:Set:UserData', { 'CharID', { 0 } })
-  TriggerEvent('DokusCore:Sync:Set:UserData', { 'UserInGame', { false } })
-  TriggerEvent('DokusCore:Sync:Set:UserData', { 'cName', { nil } })
-  TriggerEvent('DokusCore:Sync:Set:UserData', { 'SetCharMoney', { 0 } })
-  TriggerEvent('DokusCore:Sync:Set:UserData', { 'SetCharGold', { 0 } })
-  TriggerEvent('DokusCore:Sync:Set:UserData', { 'SetBankMoney', { nil } })
-  TriggerEvent('DokusCore:Sync:Set:UserData', { 'SetBankGold', { nil } })
-  TriggerEvent('DokusCore:CoreMenu:SetData',  { 'Logout' })
-  TriggerEvent('DokusCore:Sync:Set:UserData', { 'Alive', { false } })
-
-  -- Reset Plugin Data
-  TriggerEvent('DokusCore:Metabolism:UserLoggedOut')
-  TriggerEvent('DokusCore:Inventory:User:Logout')
-
-  -- Disable Radar and reset CharID
-  DisplayRadar(false)
-  UserID = 0
 end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function WalkPlayerPedsToPosition()
+  for k,v in pairs(NPCs) do
+    SetFreeze(v, false)
+    TaskGoToCoordAnyMeans(v, Spawns[k].Stop, Spawns[k].Speed, 0, 0, 786603, 0xbf800000)
+  end Wait(7000)
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function TaskPlayerPedsToScenario()
+  for k,v in pairs(NPCs) do
+    local Coords = GetCoords(v)
+    Citizen.InvokeNative(0x322BFDEA666E2B0E, v, Spawns[k].Stop, 15.0, -1, 1, 1, 1, 1)
+  end Wait(10000)
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function CreatePedCams()
+  PedCam1 = { Cam = CreateCam("DEFAULT_SCRIPTED_CAMERA"), Pos = nil, Rot = nil }
+  PedCam2 = { Cam = CreateCam("DEFAULT_SCRIPTED_CAMERA"), Pos = nil, Rot = nil }
+  PedCam3 = { Cam = CreateCam("DEFAULT_SCRIPTED_CAMERA"), Pos = nil, Rot = nil }
+
+  for k,v in pairs(NPCs) do
+    local Offset = GetCoords(v)
+    local Rotation = GetEntityRotation(v)
+    if (k == 1) then PedCam1.Pos, PedCam1.Rot = Offset, Rotation end
+    if (k == 2) then PedCam2.Pos, PedCam2.Rot = Offset, Rotation end
+    if (k == 3) then PedCam3.Pos, PedCam3.Rot = Offset, Rotation end
+  end
+
+  CamPedsSet = true
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function SetCameraActive(Type, Bool)
+  if ((Type == 'CampCam') and (CampCam ~= nil))  then SetCamActive(CampCam, Bool) end
+  if ((Type == 'PedCam1') and (PedCam1 ~= nil))  then SetCamActive(PedCam1.Cam,  Bool) end
+  if ((Type == 'PedCam2') and (PedCam2 ~= nil))  then SetCamActive(PedCam2.Cam,  Bool) end
+  if ((Type == 'PedCam3') and (PedCam3 ~= nil))  then SetCamActive(PedCam3.Cam,  Bool) end
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function TransitionCamera(Data, NPC)
+  local Cam, Pos, Rot = Data.Cam, Data.Pos, Data.Rot
+  AttachCamToEntity(Cam, NPC, (884.872 - Pos.x), 0.0, 0.6)
+  SetCamRot(Cam, Rot.x, Rot.y, (Rot.z - 180.0))
+  SetCamActiveWithInterp(Cam, CamInUse, 2400, true, true)
+  CamInUse = Cam
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function ActivateCampCam()
+  SetCamRot(CamInUse, 100.0, 200.0, 0.0)
+  SetCamActiveWithInterp(CampCam, CamInUse, 22500, true, true)
+  RenderScriptCams(true, true, 22500, true, true) Wait(3000)
+  SendPedToCamp(PedID()) Wait(100)
+  CamInUse = CampCam
+  return 22500
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function ResetTheCampForNewChar()
+  for k,v in pairs(NPCs) do DeleteEntity(v) end
+  NPCs = {}
+  SetCameraActive('CampCam', true)
+  TriggerEvent('DokusCore:Characters:Start')
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function PlaySong() if (Song.Enabled) then TriggerEvent('DokusCore:Core:MP:Music:PlayOnUser', Song.Song, Song.Volume) end end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 
 
 
